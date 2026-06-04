@@ -1,4 +1,4 @@
-import { expect, test, describe } from 'vitest';
+import { expect, test, describe, afterAll } from 'vitest';
 import { parsePostmanEnvironment, toBrunoEnv, toHoppscotchEnv } from '../src/environment-migrator';
 import * as fs from 'fs-extra';
 import * as path from 'path';
@@ -6,6 +6,11 @@ import * as path from 'path';
 describe('Environment Migrator', () => {
   const sampleEnvPath = path.join(__dirname, 'fixtures', 'sample-env.json');
   const outputDir = path.join(__dirname, 'fixtures', 'output-envs');
+
+  afterAll(() => {
+    fs.removeSync(sampleEnvPath);
+    fs.removeSync(outputDir);
+  });
 
   // Setup sample environment file
   fs.ensureDirSync(path.join(__dirname, 'fixtures'));

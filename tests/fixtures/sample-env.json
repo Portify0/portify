@@ -1,1 +1,0 @@
-{"id":"uuid","name":"Production Env","values":[{"key":"API_KEY","value":"secret123","enabled":true},{"key":"DEBUG","value":"false","enabled":false}],"_postman_variable_scope":"environment","_postman_exported_at":"2026-06-04T12:00:00.000Z","_postman_exported_using":"Postman/10.0.0"}
