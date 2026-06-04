@@ -1,0 +1,58 @@
+[
+  {
+    "file": "src/logger.ts",
+    "name": "LogLevel",
+    "line": 3,
+    "type": "const",
+    "message": "Exported \"LogLevel\" is never imported anywhere in the project."
+  },
+  {
+    "file": "src/logger.ts",
+    "name": "setLogLevel",
+    "line": 12,
+    "type": "function",
+    "message": "Exported \"setLogLevel\" is never imported anywhere in the project."
+  },
+  {
+    "file": "src/logger.ts",
+    "name": "console.log",
+    "line": 25,
+    "type": "console-pollution",
+    "message": "Console pollution: \"console.log\" detected in production code."
+  },
+  {
+    "file": "src/logger.ts",
+    "name": "console.log",
+    "line": 29,
+    "type": "console-pollution",
+    "message": "Console pollution: \"console.log\" detected in production code."
+  },
+  {
+    "file": "src/logger.ts",
+    "name": "debug",
+    "line": 32,
+    "type": "function",
+    "message": "Exported \"debug\" is never imported anywhere in the project."
+  },
+  {
+    "file": "src/logger.ts",
+    "name": "console.log",
+    "line": 33,
+    "type": "console-pollution",
+    "message": "Console pollution: \"console.log\" detected in production code."
+  },
+  {
+    "file": "src/logger.ts",
+    "name": "console.log",
+    "line": 37,
+    "type": "console-pollution",
+    "message": "Console pollution: \"console.log\" detected in production code."
+  },
+  {
+    "file": "src/logger.ts",
+    "name": "console.log",
+    "line": 41,
+    "type": "console-pollution",
+    "message": "Console pollution: \"console.log\" detected in production code."
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "name": "Production Env",
+  "version": "1.0.0",
+  "variables": [
+    {
+      "key": "API_KEY",
+      "value": "secret123"
+    }
+  ]
+}

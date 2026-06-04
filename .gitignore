@@ -1,0 +1,6 @@
+node_modules/
+dist/
+*.portify-backup-*
+portify-report.json
+portify-report.md
+.DS_Store
