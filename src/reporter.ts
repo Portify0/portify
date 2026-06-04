@@ -3,7 +3,7 @@ import * as path from "path";
 import chalk from "chalk";
 import * as logger from "./logger.js";
 
-export interface MigrationReportData {
+interface MigrationReportData {
   timestamp: string;
   type: "postman" | "localstack";
   dryRun: boolean;

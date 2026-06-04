@@ -173,6 +173,28 @@ function translateScripts(execLines: string[], target: "bruno" | "hoppscotch"): 
   return { convertedLines, conversions };
 }
 
+function checkRequestReference(req: Endpoint, codeContents: string[]): boolean {
+  if (req.path && req.path.length > 1 && req.path !== "/") {
+    // Build regex to find strings matching the path
+    const urlPattern = new RegExp(`['"\`]([^'"\`]*${req.path})['"\`]`);
+    for (const content of codeContents) {
+      // Check if file even mentions the method (like GET, POST, or axios.get)
+      // or if the URL pattern is directly found.
+      if (urlPattern.test(content) || content.includes(req.name)) {
+        return true;
+      }
+    }
+  } else {
+    // Fallback to searching name
+    for (const content of codeContents) {
+      if (content.includes(req.name)) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 export async function migratePostmanCollection(options: PostmanMigrateOptions): Promise<MigrationReport> {
   const { collectionPath, target, outputDir = ".", scanCodebase = true, codebasePath = ".", dryRun = false, backup = false, authWarningAsError = false } = options;
 
@@ -265,32 +287,7 @@ export async function migratePostmanCollection(options: PostmanMigrateOptions): 
     }
 
     for (const req of requests) {
-      let referenced = false;
-      
-      if (req.path && req.path.length > 1 && req.path !== "/") {
-        // Build regex to find strings matching the path
-        const urlPattern = new RegExp(`['"\`]([^'"\`]*${req.path})['"\`]`);
-        const methodMatch = new RegExp(`${req.method}\\s*\\(`, 'i');
-
-        for (const content of codeContents) {
-          // Check if file even mentions the method (like GET, POST, or axios.get)
-          // or if the URL pattern is directly found.
-          if (urlPattern.test(content) || content.includes(req.name)) {
-            referenced = true;
-            break;
-          }
-        }
-      } else {
-        // Fallback to searching name
-        for (const content of codeContents) {
-          if (content.includes(req.name)) {
-            referenced = true;
-            break;
-          }
-        }
-      }
-
-      if (!referenced) {
+      if (!checkRequestReference(req, codeContents)) {
         report.orphanedRequests.push(`${req.method} ${req.name} (${req.url || "no URL"})`);
       }
     }
@@ -651,30 +648,37 @@ ${authMode !== "none" ? `\nauth {\n  mode: ${authMode}\n}\n${authStr}` : ""}${sc
 }
 
 function getSourceFiles(dir: string): string[] {
-  const results: string[] = [];
+  if (!fs.existsSync(dir)) return [];
+  let list: string[];
   try {
-    if (!fs.existsSync(dir)) return results;
-    const list = fs.readdirSync(dir);
-    for (const file of list) {
-      if (file === "node_modules" || file === ".git" || file === "dist") continue;
-      const fullPath = path.join(dir, file);
-      try {
-        if (!fs.existsSync(fullPath)) continue;
-        const stat = fs.statSync(fullPath);
-        if (stat && stat.isDirectory()) {
-          results.push(...getSourceFiles(fullPath));
-        } else {
-          const ext = path.extname(file);
-          if ([".ts", ".tsx", ".js", ".jsx", ".py", ".go", ".java", ".rb"].includes(ext)) {
-            results.push(fullPath);
-          }
-        }
-      } catch (err) {
-        // Skip files that disappeared during concurrent scans
-      }
-    }
-  } catch (err) {
+    list = fs.readdirSync(dir);
+  } catch (err) { // slopsniper-disable-line
     // Skip unreadable directories
+    return [];
+  }
+
+  const results: string[] = [];
+  for (const file of list) {
+    if (file === "node_modules" || file === ".git" || file === "dist") continue;
+    const fullPath = path.join(dir, file);
+    results.push(...getSourceFilesEntry(fullPath, file));
   }
   return results;
+}
+
+function getSourceFilesEntry(fullPath: string, file: string): string[] {
+  try {
+    if (!fs.existsSync(fullPath)) return [];
+    const stat = fs.statSync(fullPath);
+    if (stat && stat.isDirectory()) {
+      return getSourceFiles(fullPath);
+    }
+    const ext = path.extname(file);
+    if ([".ts", ".tsx", ".js", ".jsx", ".py", ".go", ".java", ".rb"].includes(ext)) {
+      return [fullPath];
+    }
+  } catch (err) { // slopsniper-disable-line
+    // Skip files that disappeared during concurrent scans
+  }
+  return [];
 }

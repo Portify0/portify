@@ -70,15 +70,10 @@ export async function migrateLocalStack(options: LocalStackMigrateOptions): Prom
         });
 
         if (autofix) {
-          let replacement = "";
-          if (alternative === "floci") {
-            replacement = line.replace(/localstack\/localstack.*/, "floci/floci:latest");
-          } else if (alternative === "moto") {
-            replacement = line.replace(/localstack\/localstack.*/, "motoserver/moto:latest");
-          } else {
-            replacement = line.replace(/localstack\/localstack.*/, "ministack/ministack:latest");
-          }
-          newLines[i] = replacement;
+          const replacementImage = alternative === "floci" ? "floci/floci:latest"
+            : alternative === "moto" ? "motoserver/moto:latest"
+            : "ministack/ministack:latest";
+          newLines[i] = line.replace(/localstack\/localstack.*/, replacementImage);
           fileModified = true;
           fixedCount++;
         }
