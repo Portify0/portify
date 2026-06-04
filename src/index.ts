@@ -93,7 +93,7 @@ program
       }
     } catch (err: any) {
       spinner.fail("Migration failed");
-      logger.error(`Error during migration: ${err.message}`);
+      logger.error(`Error during migration: ${err.stack || err.message}`);
       process.exit(1);
     }
   });
